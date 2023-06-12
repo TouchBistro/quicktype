@@ -1,0 +1,44 @@
+import { AxiosInstance, AxiosRequestConfig } from 'axios'
+import * as Types from './{{classPrefix}}Types'
+
+export class {{classPrefix}}Client
+{
+    #httpClient: AxiosInstance
+
+    constructor(httpClient: AxiosInstance) {
+        this.#httpClient = httpClient
+    }
+{{#each routes}}
+
+    async {{camelCase this.name}}(
+        {{#if this.request}}request: {{#unless this.request.isPrimitive}}Types.{{/unless}}{{this.request.type}}{{#if this.request.isArray}}[]{{/if}}, {{/if}}
+        {{#if parameters}}
+        {
+            {{#each this.parameters}}
+            {{this.name}},
+            {{/each}}
+        }: {
+            {{#each this.parameters}}
+            {{this.name}}{{#if this.type.isOptional}}?{{/if}}: {{#unless this.type.isPrimitive}}Types.{{/unless}}{{this.type.type}}{{#if this.type.isArray}}[]{{/if}},
+            {{/each}}
+        },
+        {{/if}}
+        config?: AxiosRequestConfig
+    ): {{#if this.response}}Promise<{{#unless this.response.isPrimitive}}Types.{{/unless}}{{{this.response.type}}}{{#if this.response.isArray}}[]{{/if}}>{{else}}Promise<void>{{/if}} {
+        
+        const path = "{{this.path}}"
+{{#each this.pathParameters}}
+        .replace("{{surroundWithCurlyBraces this.name}}", {{this.name}})
+{{/each}}
+        const result = await this.#httpClient.request{{#if this.response}}<{{#unless this.response.isPrimitive}}Types.{{/unless}}{{{this.response.type}}}{{#if this.response.isArray}}[]{{/if}}>{{/if}}({
+            ...config,
+            url: path,
+            method: '{{this.method}}',
+            {{#if this.request}}data: request,{{/if}}
+            params: { ...config?.params, {{#each this.queryParameters}}{{this.name}}, {{/each}} }
+    })
+
+        return result.data
+    }
+{{/each}}
+}

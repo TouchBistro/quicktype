@@ -1,0 +1,122 @@
+---
+openapi: 3.0.2
+info:
+    title: Test Widget API
+    description: Widget
+    version: 2.0.0
+    contact:
+        email: duzumeri@touchbistro.com
+servers:
+    - url: http://widgets.com/widget
+      description: Production
+tags:
+    - name: widgets
+paths:
+    "/widgets1/{widgetID}":
+        get:
+            summary: Returns organization assigned addresses
+            description: Returns addresses of organization associated with given identifier
+                which were assigned to the organization using tags.
+            operationId: getOrganizationAddresses
+            tags:
+                - widgets
+            parameters:
+                - "$ref": "#/components/parameters/widgetID"
+            responses:
+                "200":
+                    description: Request is processed successfully
+                    headers:
+                        Last-modified:
+                            schema:
+                                description: Date and time when this resource was modified
+                                example: "2011-10-05T14:48:00.000Z"
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - "$ref": "#/components/schemas/Widget"
+                "400":
+                    "$ref": "#/components/responses/BadRequest"
+                "404":
+                    "$ref": "#/components/responses/NotFound"
+                "401":
+                    "$ref": "#/components/responses/Unauthorized"
+    "/widgets2/{widgetID}":
+        get:
+            summary: Returns all organization owned addresses
+            description: Returns addresses owned by organization(includes addresses assigned
+                to venues under this organization)
+            operationId: getOrganizationOwnedAddresses
+            tags:
+                - widgets
+            parameters:
+                - "$ref": "#/components/parameters/widgetID"
+            responses:
+                "200":
+                    description: Request is processed successfully
+                    headers:
+                        Last-modified:
+                            schema:
+                                description: Date and time when this resource was modified
+                                example: "2011-10-05T14:48:00.000Z"
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - "$ref": "#/components/schemas/Widget"
+                "400":
+                    "$ref": "#/components/responses/BadRequest"
+                "404":
+                    "$ref": "#/components/responses/NotFound"
+                "401":
+                    "$ref": "#/components/responses/Unauthorized"
+components:
+    schemas:
+        Widget:
+            properties:
+                name:
+                    type: string
+            required:
+                - name
+            additionalProperties: false
+        Error:
+            type: object
+            x-sensitive: false
+            properties:
+                code:
+                    type: string
+                    x-sensitive: false
+                    description: error code
+                message:
+                    type: string
+                    x-sensitive: false
+                    description: error message
+    parameters:
+        widgetID:
+            in: path
+            name: widgetID
+            required: true
+            description: organization unique identifer
+            schema:
+                type: string
+    responses:
+        BadRequest:
+            description: Request provided was not properly formed or did not have all the
+                required information. See the response body error property for more details
+            content:
+                application/json:
+                    schema:
+                        "$ref": "#/components/schemas/Error"
+        NotFound:
+            description: Requested resource was not found. See the response body error property
+                for more details
+            content:
+                application/json:
+                    schema:
+                        "$ref": "#/components/schemas/Error"
+        Unauthorized:
+            description: Request did not have a valid HTTP Authorization Bearer Access Token.
+            content:
+                application/json:
+                    schema:
+                        "$ref": "#/components/schemas/Error"
