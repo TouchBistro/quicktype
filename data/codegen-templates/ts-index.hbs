@@ -1,0 +1,4 @@
+{{#each this}}
+export { {{this}}Client } from './{{this}}Client'
+export * as {{this}}Types from './{{this}}Types'
+{{/each}}

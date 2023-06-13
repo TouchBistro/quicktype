@@ -1,0 +1,77 @@
+---
+openapi: 3.0.2
+info:
+    title: Test Widget API
+    description: Widget
+    version: 2.0.0
+    contact:
+        email: duzumeri@touchbistro.com
+servers:
+    - url: http://widgets.com/widget
+      description: Production
+tags:
+    - name: widgets
+paths:
+    "/widgets1/{widgetID}":
+        get:
+            summary: Returns organization assigned addresses
+            description: Returns addresses of organization associated with given identifier
+                which were assigned to the organization using tags.
+            operationId: getWidgets1
+            tags:
+                - widgets
+            parameters:
+                - "$ref": "#/components/parameters/widgetID"
+            responses:
+                "200":
+                    description: Request is processed successfully
+                    headers:
+                        Last-modified:
+                            schema:
+                                description: Date and time when this resource was modified
+                                example: "2011-10-05T14:48:00.000Z"
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - "$ref": "#/components/schemas/Widget"
+    "/widgets2/{widgetID}":
+        get:
+            summary: Returns all organization owned addresses
+            description: Returns addresses owned by organization(includes addresses assigned
+                to venues under this organization)
+            operationId: getWidgets2
+            tags:
+                - widgets
+            parameters:
+                - "$ref": "#/components/parameters/widgetID"
+            responses:
+                "200":
+                    description: Request is processed successfully
+                    headers:
+                        Last-modified:
+                            schema:
+                                description: Date and time when this resource was modified
+                                example: "2011-10-05T14:48:00.000Z"
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - "$ref": "#/components/schemas/Widget"
+components:
+    schemas:
+        Widget:
+            properties:
+                name:
+                    type: string
+            required:
+                - name
+            additionalProperties: false
+    parameters:
+        widgetID:
+            in: path
+            name: widgetID
+            required: true
+            description: organization unique identifer
+            schema:
+                type: string

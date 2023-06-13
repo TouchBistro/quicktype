@@ -1,0 +1,73 @@
+import Foundation
+
+public struct {{classPrefix}}Client
+{
+    let httpService: VCSHTTPRequestable
+    let vcsUrl: String
+    private let JSONDecoder: () -> JSONDecoder = {
+        let decoder = Foundation.JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601Decoding
+        return decoder
+    }
+    public init(httpService: VCSHTTPRequestable, vcsUrl: String) {
+        self.httpService = httpService
+        self.vcsUrl = vcsUrl
+    }
+{{#each routes}}
+
+{{#if this.response.name}}
+    public typealias {{this.name}}CompletionHandler = (Result<{{this.response.name}}, VCSTBClientError>) -> Void
+{{else}}
+    public typealias {{this.name}}CompletionHandler = (Result<Void, VCSTBClientError>) -> Void
+{{/if}}
+
+{{#if this.request.name}}
+    public func {{camelCase this.name}}(request: {{this.request.name}}, {{#each this.parameters}}{{this.name}}: {{{this.type}}}{{#if this.isOptional}}?{{/if}}, {{/each}}completion: @escaping {{this.name}}CompletionHandler) {
+{{else}}
+    public func {{camelCase this.name}}({{#each this.parameters}}{{this.name}}: {{{this.type}}}{{#if this.isOptional}}?{{/if}}, {{/each}}completion: @escaping {{this.name}}CompletionHandler) {
+{{/if}}
+
+{{#if this.request.name}}
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601Encoding
+
+        guard let data = try? encoder.encode(request) else {
+            completion(.failure(.encoding))
+            return
+        }
+{{/if}}
+        
+{{#if this.pathParameters}}
+        var path = "{{this.path}}"
+{{#each this.pathParameters}}
+        path = path.replacingOccurrences(of: "{{surroundWithCurlyBraces this.name}}", with: {{this.name}})
+{{/each}}
+{{else}}
+        let path = "{{this.path}}"
+{{/if}}
+{{#if this.request.name}}
+        guard let request = vcsURLRequest(with: vcsUrl + path, body: data, method: "{{this.method}}") else { completion(.failure(.createRequest)); return }
+{{else}}
+        guard let request = vcsURLRequest(with: vcsUrl + path, body: nil, method: "{{this.method}}") else { completion(.failure(.createRequest)); return }
+{{/if}}
+        httpService.dataRequest(urlRequest: request, responseMimeType: "application/json") { result in
+            switch result {
+{{#if this.response.name}}
+            case let .success(data):
+                do {
+                    let payload = try self.JSONDecoder().decode({{this.response.name}}.self, from: data)
+                    completion(.success(payload))
+                } catch {
+                    completion(.failure(.decoding))
+                }
+{{else}}
+            case .success:
+                completion(.success(()))
+{{/if}}
+            case let .failure(error):
+                completion(.failure(.httpError(error)))
+            }
+        }
+    }
+{{/each}}
+}
