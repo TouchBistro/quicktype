@@ -17,7 +17,7 @@ paths:
             summary: Returns organization assigned addresses
             description: Returns addresses of organization associated with given identifier
                 which were assigned to the organization using tags.
-            operationId: getOrganizationAddresses
+            operationId: getWidgets1
             tags:
                 - widgets
             parameters:
@@ -35,18 +35,12 @@ paths:
                             schema:
                                 oneOf:
                                     - "$ref": "#/components/schemas/Widget"
-                "400":
-                    "$ref": "#/components/responses/BadRequest"
-                "404":
-                    "$ref": "#/components/responses/NotFound"
-                "401":
-                    "$ref": "#/components/responses/Unauthorized"
     "/widgets2/{widgetID}":
         get:
             summary: Returns all organization owned addresses
             description: Returns addresses owned by organization(includes addresses assigned
                 to venues under this organization)
-            operationId: getOrganizationOwnedAddresses
+            operationId: getWidgets2
             tags:
                 - widgets
             parameters:
@@ -64,12 +58,6 @@ paths:
                             schema:
                                 oneOf:
                                     - "$ref": "#/components/schemas/Widget"
-                "400":
-                    "$ref": "#/components/responses/BadRequest"
-                "404":
-                    "$ref": "#/components/responses/NotFound"
-                "401":
-                    "$ref": "#/components/responses/Unauthorized"
 components:
     schemas:
         Widget:
@@ -79,18 +67,6 @@ components:
             required:
                 - name
             additionalProperties: false
-        Error:
-            type: object
-            x-sensitive: false
-            properties:
-                code:
-                    type: string
-                    x-sensitive: false
-                    description: error code
-                message:
-                    type: string
-                    x-sensitive: false
-                    description: error message
     parameters:
         widgetID:
             in: path
@@ -99,24 +75,3 @@ components:
             description: organization unique identifer
             schema:
                 type: string
-    responses:
-        BadRequest:
-            description: Request provided was not properly formed or did not have all the
-                required information. See the response body error property for more details
-            content:
-                application/json:
-                    schema:
-                        "$ref": "#/components/schemas/Error"
-        NotFound:
-            description: Requested resource was not found. See the response body error property
-                for more details
-            content:
-                application/json:
-                    schema:
-                        "$ref": "#/components/schemas/Error"
-        Unauthorized:
-            description: Request did not have a valid HTTP Authorization Bearer Access Token.
-            content:
-                application/json:
-                    schema:
-                        "$ref": "#/components/schemas/Error"

@@ -8,16 +8,16 @@ export class BackofficeFrontendClient {
     this.#httpClient = httpClient
   }
 
-  async getOrganizationAddresses(
+  async getWidgets1(
     {
       widgetID,
     }: {
       widgetID: string
     },
     config?: AxiosRequestConfig
-  ): Promise<Types.GetOrganizationAddressesResponseBody> {
+  ): Promise<Types.GetWidgets1ResponseBody> {
     const path = '/widgets1/{widgetID}'.replace('{widgetID}', widgetID)
-    const result = await this.#httpClient.request<Types.GetOrganizationAddressesResponseBody>({
+    const result = await this.#httpClient.request<Types.GetWidgets1ResponseBody>({
       ...config,
       url: path,
       method: 'get',
@@ -28,16 +28,16 @@ export class BackofficeFrontendClient {
     return result.data
   }
 
-  async getOrganizationOwnedAddresses(
+  async getWidgets2(
     {
       widgetID,
     }: {
       widgetID: string
     },
     config?: AxiosRequestConfig
-  ): Promise<Types.GetOrganizationOwnedAddressesResponseBody> {
+  ): Promise<Types.GetWidgets2ResponseBody> {
     const path = '/widgets2/{widgetID}'.replace('{widgetID}', widgetID)
-    const result = await this.#httpClient.request<Types.GetOrganizationOwnedAddressesResponseBody>({
+    const result = await this.#httpClient.request<Types.GetWidgets2ResponseBody>({
       ...config,
       url: path,
       method: 'get',
